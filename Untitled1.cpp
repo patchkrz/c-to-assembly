@@ -1,22 +1,36 @@
+/* Efe Kiraz 2016502071 Microproccessor Term Homework
+ * Last modification 26/05/2020
+ *
+ * This code reads previosly user defined .c file. Then it translates 
+ * the .c syntax code into .asm syntax. 
+ *
+ */
+
+
 #include<stdio.h>
 #include<conio.h>
 #include<string.h>
 #include<stdlib.h>
 
-void search_func(FILE* );
+void search_block(FILE* );
+void operator_type(const char* );
+void add_assembly(void);
+void sub_assembly(void);
+void mult_assembly(void);
 
 int main (){
-   // reads the file name and stores in pointer
-   
+	
+   // reads the file name and stores in pointer   
    char *cfile_name = (char*)malloc(sizeof(char) * 255);
    printf("Write down the file name with its extension\n");
    scanf("%[^\n]s",cfile_name);        
+   
    
    //opens the user defined file
    FILE *fp = NULL;	
    if(fp=fopen(cfile_name,"r")){
    	   
-       search_func(fp);
+       search_block(fp);
       
    }
    
@@ -30,8 +44,12 @@ int main (){
 	
 }
 
-
-void search_func(FILE* fp){
+/*
+ * Function "search_block" takes file pointer then by using the  
+ * the pointer, it detects the code blocks nested inside the function, 
+ * which is previously written inside the file.
+ */
+void search_block(FILE* fp){
    
    char line[100] = {0};
    
@@ -41,41 +59,60 @@ void search_func(FILE* fp){
    
    while(fgets ( line, sizeof ( line), fp)){
    	  
-   	  if((strchr((const char*)(&line), '{') == NULL))
+   	  if((strchr((const char*)(&line), '{') == NULL)){
+		 
    	     func = strtok((char*)(&line), &end_of_block[0]); 
-   	    printf("%s\n",func);
-      
+   	     operator_type(func);
+		 // "func" is the remaining part of the block after removing curly brackets.
+      }
       
    }
-   //printf("%d",i);
-    
-      
-   
-   
-   
-   /*for(int i = 0 ; ; i++ ){
-      
-      
-      
-      if(*(temp+i) == '{'){
-         
-		 *func = *(temp+i);
-		 	
-	  }  
-         
-         *(func+i) = *(temp+i);
-          printf("%s\n",func);
-      
-      if(*(temp+i) == '}'){
-	  
-         break;
-    }
-   }
-   */
-   
-   
    return ;
 }
+
+/* 
+ * "operator_type" takes the part which contains numbers and symbol of operation as an input.
+ * By detecting the symbol of operation, function call is done to write assembly equivalent.
+ *
+ */
+void operator_type(const char* operation){
+   
+   char* temp = NULL;
+   
+   temp = strchr (operation, '+');
+   if (temp!=NULL)
+      add_assembly();
+   
+   temp = strchr (operation, '-');
+   if (temp!=NULL)
+      sub_assembly();
+   
+   temp = strchr (operation, '*');
+   if (temp!=NULL)
+      mult_assembly();
+   
+   //printf("%s",operation);
+   //printf("%s\n\n",temp);
+   return ;
+}
+
+void add_assembly(void){
+	printf("sum:\n\tSUB.W   #4, R1\n\tMOV.W   R12, 2(R1)\n\tMOV.W   R13, @R1\n\tMOV.W   2(R1), R12\n\tADD.W   @R1, R12\n\tADD.W   #4, R1\n\tRET\n\n\n");
+	return ;
+}
+
+
+void sub_assembly(void){
+	printf("sub:\n\tSUB.W   #4, R1\n\tMOV.W   R12, 2(R1)\n\tMOV.W   R13, @R1\n\tMOV.W   2(R1), R12\n\tSUB.W   @R1, R12\n\tADD.W   #4, R1\n\tRET\n\n\n");
+	return ;
+}
+
+void mult_assembly(void){
+	printf("mult:\n\tSUB.W   #4, R1\n\tMOV.W   R12, 2(R1)\n\tMOV.W   R13, @R1\n\tMOV.W   @R1, R13\n\tMOV.W   2(R1), R12\n\tCALL    #__mspabi_mpyi\n\tADD.W   #4, R1\n\tRET\n\n\n");
+	return ;
+}
+
+
 
 
 
