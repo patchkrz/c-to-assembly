@@ -1,4 +1,5 @@
-/* Efe Kiraz 2016502071 Microproccessor Term Homework
+/* 
+ *Efe Kiraz 2016502071 Microproccessor Term Homework
  * Last modification 26/05/2020
  *
  * This code reads previosly user defined .c file. Then it translates 
@@ -18,16 +19,18 @@ void add_assembly(void);
 void sub_assembly(void);
 void mult_assembly(void);
 
+extern char cfile_name[100] = {0};
+
+extern FILE* fp_assembly_output = NULL; 
+
 int main (){
 	
-   // reads the file name and stores in pointer   
-   char *cfile_name = (char*)malloc(sizeof(char) * 255);
    printf("Write down the file name with its extension\n");
    scanf("%[^\n]s",cfile_name);        
    
    
    //opens the user defined file
-   FILE *fp = NULL;	
+   FILE *fp = NULL;
    if(fp=fopen(cfile_name,"r")){
    	   
        search_block(fp);
@@ -35,10 +38,10 @@ int main (){
    }
    
    else
-      printf("dosya acilamadi");
+      printf(".c file cannot be opened.");
     
     
-   free(cfile_name);
+   
    getch();
    return 0;
 	
@@ -79,40 +82,105 @@ void operator_type(const char* operation){
    
    char* temp = NULL;
    
-   temp = strchr (operation, '+');
+   temp = strchr (operation, '-');
    if (temp!=NULL)
       add_assembly();
    
    temp = strchr (operation, '-');
    if (temp!=NULL)
       sub_assembly();
-   
+   /*
    temp = strchr (operation, '*');
    if (temp!=NULL)
       mult_assembly();
+   */
    
-   //printf("%s",operation);
-   //printf("%s\n\n",temp);
    return ;
 }
 
+
 void add_assembly(void){
-	printf("sum:\n\tSUB.W   #4, R1\n\tMOV.W   R12, 2(R1)\n\tMOV.W   R13, @R1\n\tMOV.W   2(R1), R12\n\tADD.W   @R1, R12\n\tADD.W   #4, R1\n\tRET\n\n\n");
-	return ;
+   	
+   const char new_extension[5] = {".asm"};
+   
+   char token[100] = {0};   
+   
+   for(int i=0; cfile_name[i] != '.'; i++){  // used to delete .c extension
+      
+      token[i] = cfile_name[i];
+      
+   }
+   
+   char* output_file_name = strcat(token, new_extension); // used to create a file name concateneted with .asm 
+   
+   fp_assembly_output = fopen(output_file_name, "w");
+   
+   if(fp_assembly_output==NULL){
+      printf("Assembly file cannot be created.");
+      exit(1);
+   }
+   else{
+      printf("Assembly file is being created.");
+	  fprintf(fp_assembly_output,"sum:\n\tSUB.W   #4, R1\n\tMOV.W   R12, 2(R1)\n\tMOV.W   R13, @R1\n\tMOV.W   2(R1), R12\n\tADD.W   @R1, R12\n\tADD.W   #4, R1\n\tRET\n\n\n");
+   }
+   fclose(fp_assembly_output);
+   return ;
 }
 
 
 void sub_assembly(void){
-	printf("sub:\n\tSUB.W   #4, R1\n\tMOV.W   R12, 2(R1)\n\tMOV.W   R13, @R1\n\tMOV.W   2(R1), R12\n\tSUB.W   @R1, R12\n\tADD.W   #4, R1\n\tRET\n\n\n");
-	return ;
+	
+   const char new_extension[5] = {".asm"};
+   
+   char token[100] = {0};
+   
+   for(int i=0; cfile_name[i] != '.'; i++){  // used to delete .c extension
+      
+      token[i] = cfile_name[i];
+      
+   }
+   
+   char* output_file_name = strcat(token, new_extension); // used to create a file name concateneted with .asm 
+   
+   fp_assembly_output = fopen(output_file_name, "w"); 
+   
+   if(fp_assembly_output==NULL){
+      printf("Assembly file cannot be created.");
+      exit(1);
+   }
+   else{
+      printf("Assembly file is being created.");
+      fprintf(fp_assembly_output,"sub:\n\tSUB.W   #4, R1\n\tMOV.W   R12, 2(R1)\n\tMOV.W   R13, @R1\n\tMOV.W   2(R1), R12\n\tSUB.W   @R1, R12\n\tADD.W   #4, R1\n\tRET\n\n\n");
+   }
+   fclose(fp_assembly_output);
+   return ;
 }
 
 void mult_assembly(void){
-	printf("mult:\n\tSUB.W   #4, R1\n\tMOV.W   R12, 2(R1)\n\tMOV.W   R13, @R1\n\tMOV.W   @R1, R13\n\tMOV.W   2(R1), R12\n\tCALL    #__mspabi_mpyi\n\tADD.W   #4, R1\n\tRET\n\n\n");
-	return ;
+   
+   const char new_extension[5] = {".asm"};
+   
+   char token[100] = {0};
+   
+   for(int i=0; cfile_name[i] != '.'; i++){  // used to delete .c extension
+      
+      token[i] = cfile_name[i];
+      
+   }
+   
+   char* output_file_name = strcat(token, new_extension); // used to create a file name concateneted with .asm 
+   
+   fp_assembly_output = fopen(output_file_name, "w"); 
+   
+   if(fp_assembly_output==NULL){
+      printf("Assembly file cannot be created.");
+      exit(1);
+   }
+   else{
+      printf("Assembly file is being created.");
+      fprintf(fp_assembly_output,"mult:\n\tSUB.W   #4, R1\n\tMOV.W   R12, 2(R1)\n\tMOV.W   R13, @R1\n\tMOV.W   @R1, R13\n\tMOV.W   2(R1), R12\n\tCALL    #__mspabi_mpyi\n\tADD.W   #4, R1\n\tRET\n\n\n");
+   }
+   fclose(fp_assembly_output);
+   return ;
 }
-
-
-
-
 
